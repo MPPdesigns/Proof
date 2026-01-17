@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proof Sequencing: Fundamental Theorem of Arithmetic</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 26px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        .instructions {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .instructions h2 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .instructions p {
+            color: #555;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .card-bank, .drop-zone-container {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            min-height: 400px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .card {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .card.selected {
+            border-color: #667eea;
+            border-width: 3px;
+            background: #f0f4ff;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .card-content {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .drop-slot {
+            background: white;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            min-height: 60px;
+            transition: all 0.2s;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .drop-slot:hover {
+            background: #f8f8f8;
+        }
+
+        .drop-slot::before {
+            content: attr(data-position);
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #999;
+            pointer-events: none;
+        }
+
+        .drop-slot.has-card {
+            border-style: solid;
+            border-color: #ddd;
+        }
+
+        .drop-slot.correct {
+            border-color: #4caf50;
+            background: #e8f5e9;
+        }
+
+        .drop-slot.incorrect {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+
+        .drop-slot .card {
+            margin-bottom: 0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.reset {
+            background: #757575;
+        }
+
+        button.reset:hover {
+            background: #616161;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.success {
+            background: #c8e6c9;
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+        }
+
+        .feedback.partial {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Make KaTeX math smaller to match text */
+        .katex {
+            font-size: 1em !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Proof Sequencing Activity</h1>
+        <p class="subtitle">Fundamental Theorem of Arithmetic (Existence)</p>
+
+        <div class="instructions">
+            <h2>📋 Instructions</h2>
+            <p>Click a card to select it (it will highlight in blue), then click a step slot on the right to place it there. Click "Check My Proof" when you're ready to see how you did!</p>
+        </div>
+
+        <div class="game-area">
+            <div class="card-bank">
+                <div class="section-title">Card Bank</div>
+                <div id="cardBank"></div>
+            </div>
+
+            <div class="drop-zone-container">
+                <div class="section-title">Proof Sequence</div>
+                <div id="dropZone"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="checkBtn">Check My Proof</button>
+            <button id="resetBtn" class="reset">Reset</button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <script>
+        // Proof statements in correct order
+        const statements = [
+            "Every integer greater than $1$ can be expressed as a product of primes.",
+            "Suppose that the result is not true. That is, suppose every integer greater than one cannot be expressed as a product of primes. We'll show that this leads to a contradiction.",
+            "Then there must be a minimal counterexample.",
+            "That is, there is a smallest number that doesn't have a prime factorisation, say $n$.",
+            "Any prime has a prime factorisation.",
+            "So $n$ is not prime.",
+            "So $n$ is composite, say $n = ab$, with $1 < a, b < n$.",
+            "Since $a$ and $b$ are smaller than $n$, they have prime factorisations. Recall that $n$ is the smallest number that doesn't have a prime factorisation.",
+            "But then $n$ has a prime factorisation: the product of the prime factorisations of $a$ and $b$.",
+            "So there is no counterexample—the result is true."
+        ];
+
+        let cards = [];
+        let selectedCard = null;
+
+        // Initialize the game
+        function init() {
+            createCards();
+            createDropZones();
+            renderMath();
+            attachEventListeners();
+        }
+
+        // Shuffle array
+        function shuffle(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Create shuffled cards
+        function createCards() {
+            const cardBank = document.getElementById('cardBank');
+            const shuffledStatements = shuffle(statements.map((text, index) => ({ text, correctIndex: index })));
+            
+            shuffledStatements.forEach((statement, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.correctIndex = statement.correctIndex;
+                card.dataset.cardId = `card-${index}`;
+                
+                const content = document.createElement('div');
+                content.className = 'card-content';
+                content.textContent = statement.text;
+                
+                card.appendChild(content);
+                cardBank.appendChild(card);
+                cards.push(card);
+                
+                // Click to select
+                card.addEventListener('click', handleCardClick);
+            });
+        }
+
+        // Create drop zones
+        function createDropZones() {
+            const dropZone = document.getElementById('dropZone');
+            
+            for (let i = 0; i < statements.length; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'drop-slot';
+                slot.dataset.position = `Step ${i + 1}`;
+                slot.dataset.slotIndex = i;
+                
+                slot.addEventListener('click', handleSlotClick);
+                
+                dropZone.appendChild(slot);
+            }
+        }
+
+        // Render math with KaTeX
+        function renderMath() {
+            setTimeout(() => {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }, 100);
+        }
+
+        // Click handlers
+        function handleCardClick(e) {
+            e.stopPropagation(); // Prevent slot click when clicking card
+            
+            // If a different card is already selected and this card is in a slot, treat as a swap
+            if (selectedCard && selectedCard !== this && this.parentElement.classList.contains('drop-slot')) {
+                const targetSlot = this.parentElement;
+                const selectedCardParent = selectedCard.parentElement;
+                
+                // Swap the two cards
+                if (selectedCardParent.classList.contains('drop-slot')) {
+                    selectedCardParent.appendChild(this);
+                    targetSlot.appendChild(selectedCard);
+                    selectedCardParent.classList.add('has-card');
+                    targetSlot.classList.add('has-card');
+                } else {
+                    // Selected card from bank, replace this card
+                    document.getElementById('cardBank').appendChild(this);
+                    targetSlot.appendChild(selectedCard);
+                    targetSlot.classList.add('has-card');
+                }
+                
+                selectedCard.classList.remove('selected');
+                selectedCard = null;
+                clearFeedback();
+                return;
+            }
+            
+            // If this card is already selected, deselect it
+            if (this.classList.contains('selected')) {
+                this.classList.remove('selected');
+                selectedCard = null;
+                return;
+            }
+            
+            // Deselect any previously selected card
+            if (selectedCard) {
+                selectedCard.classList.remove('selected');
+            }
+            
+            // Select this card
+            this.classList.add('selected');
+            selectedCard = this;
+        }
+
+        function handleSlotClick(e) {
+            // If no card is selected, do nothing
+            if (!selectedCard) return;
+            
+            // Get the existing card in this slot (if any)
+            const existingCard = this.querySelector('.card');
+            const selectedCardParent = selectedCard.parentElement;
+            
+            // Don't place a card in its own slot
+            if (this === selectedCardParent) {
+                selectedCard.classList.remove('selected');
+                selectedCard = null;
+                return;
+            }
+            
+            if (existingCard && existingCard !== selectedCard) {
+                // Swap: move existing card to where selected card came from
+                if (selectedCardParent.classList.contains('drop-slot')) {
+                    // Both cards are in slots - swap them
+                    selectedCardParent.appendChild(existingCard);
+                    selectedCardParent.classList.add('has-card');
+                } else {
+                    // Selected card was in bank - put existing card back in bank
+                    document.getElementById('cardBank').appendChild(existingCard);
+                }
+            } else if (!existingCard) {
+                // Slot was empty - just clear the parent slot if it was a slot
+                if (selectedCardParent.classList.contains('drop-slot')) {
+                    selectedCardParent.classList.remove('has-card', 'correct', 'incorrect');
+                }
+            }
+            
+            // Move selected card to this slot (only if it's not already the selected card)
+            if (existingCard !== selectedCard) {
+                this.appendChild(selectedCard);
+                this.classList.add('has-card');
+            }
+            
+            // Deselect the card
+            selectedCard.classList.remove('selected');
+            selectedCard = null;
+            
+            // Clear feedback when moving cards
+            clearFeedback();
+        }
+
+        // Check the proof
+        function checkProof() {
+            const slots = document.querySelectorAll('.drop-slot');
+            let correct = 0;
+            let total = 0;
+            
+            slots.forEach((slot, index) => {
+                const card = slot.querySelector('.card');
+                if (card) {
+                    total++;
+                    const correctIndex = parseInt(card.dataset.correctIndex);
+                    
+                    if (correctIndex === index) {
+                        correct++;
+                        // Always mark correct ones
+                        slot.classList.add('correct');
+                        slot.classList.remove('incorrect');
+                    } else {
+                        // Only mark incorrect if we have more than half correct
+                        if (correct > 5 || correct === 5) {
+                            slot.classList.add('incorrect');
+                        } else {
+                            slot.classList.remove('incorrect');
+                        }
+                        slot.classList.remove('correct');
+                    }
+                }
+            });
+            
+            // If less than 5 correct, need to re-evaluate to only show green borders
+            if (correct < 5) {
+                slots.forEach((slot, index) => {
+                    const card = slot.querySelector('.card');
+                    if (card) {
+                        const correctIndex = parseInt(card.dataset.correctIndex);
+                        if (correctIndex === index) {
+                            slot.classList.add('correct');
+                            slot.classList.remove('incorrect');
+                        } else {
+                            slot.classList.remove('correct', 'incorrect');
+                        }
+                    }
+                });
+            }
+            
+            // Show feedback
+            const feedback = document.getElementById('feedback');
+            feedback.classList.add('show');
+            
+            if (correct === statements.length) {
+                feedback.className = 'feedback show success';
+                feedback.textContent = 'Correct';
+            } else if (correct > 5) {
+                feedback.className = 'feedback show partial';
+                feedback.textContent = 'Great start! More than half of the steps are sequenced correctly.';
+            } else if (correct === 5) {
+                feedback.className = 'feedback show partial';
+                feedback.textContent = 'Great start! Exactly half of the steps are sequenced correctly.';
+            } else {
+                feedback.className = 'feedback show partial';
+                feedback.textContent = 'Good start! I\'ve highlighted the steps that are in the correct position for you.';
+            }
+        }
+
+        // Clear feedback
+        function clearFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('show');
+            
+            const slots = document.querySelectorAll('.drop-slot');
+            slots.forEach(slot => {
+                slot.classList.remove('correct', 'incorrect');
+            });
+        }
+
+        // Reset the game
+        function reset() {
+            clearFeedback();
+            
+            // Deselect any selected card
+            if (selectedCard) {
+                selectedCard.classList.remove('selected');
+                selectedCard = null;
+            }
+            
+            // Move all cards back to bank
+            const cardBank = document.getElementById('cardBank');
+            const slots = document.querySelectorAll('.drop-slot');
+            
+            slots.forEach(slot => {
+                const card = slot.querySelector('.card');
+                if (card) {
+                    card.classList.remove('selected');
+                    cardBank.appendChild(card);
+                }
+                slot.classList.remove('has-card', 'correct', 'incorrect');
+            });
+            
+            // Reshuffle cards in bank
+            const cardsInBank = Array.from(cardBank.querySelectorAll('.card'));
+            const shuffled = shuffle(cardsInBank);
+            shuffled.forEach(card => cardBank.appendChild(card));
+        }
+
+        // Attach button listeners
+        function attachEventListeners() {
+            document.getElementById('checkBtn').addEventListener('click', checkProof);
+            document.getElementById('resetBtn').addEventListener('click', reset);
+        }
+
+        // Start the game
+        init();
+    </script>
+</body>
+</html>
