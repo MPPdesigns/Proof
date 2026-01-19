@@ -269,21 +269,23 @@
         </div>
 
         <div id="feedback" class="feedback"></div>
+
+        <div style="text-align: center; margin-top: 20px; color: #666; font-size: 13px;">
+            Adapted from <a href="https://undergroundmathematics.org/" target="_blank" style="color: #667eea; text-decoration: none;">undergroundmathematics.org</a> for classroom demonstration.
+        </div>
     </div>
 
     <script>
         // Proof statements in correct order
         const statements = [
             "Every integer greater than $1$ can be expressed as a product of primes.",
-            "Suppose that the result is not true. That is, suppose every integer greater than one cannot be expressed as a product of primes. We'll show that this leads to a contradiction.",
-            "Then there must be a minimal counterexample.",
-            "That is, there is a smallest number that doesn't have a prime factorisation, say $n$.",
-            "Any prime has a prime factorisation.",
-            "So $n$ is not prime.",
-            "So $n$ is composite, say $n = ab$, with $1 < a, b < n$.",
-            "Since $a$ and $b$ are smaller than $n$, they have prime factorisations. Recall that $n$ is the smallest number that doesn't have a prime factorisation.",
-            "But then $n$ has a prime factorisation: the product of the prime factorisations of $a$ and $b$.",
-            "So there is no counterexample—the result is true."
+            "For the sake of a contradiction, suppose that every integer greater than one cannot be expressed as a product of primes.",
+            "Then, there must exist a smallest number that doesn't have a prime factorization, say $n$.",
+            "Since every prime has a prime factorization, $n$ must not be prime.",
+            "Thus, $n$ is composite. This means $n = ab$, with $1 < a, b < n$.",
+            "Since $a$ and $b$ are smaller than $n$, they must have prime factorizations since $n$ was said to be the smallest number that does not have a prime factorization.",
+            "But that would mean $n$ does have a prime factorization. Specifically, the product of the prime factorizations of $a$ and $b$.",
+            "So our smallest counterexample is not a counterexample at all. Thus, we conclude every integer greater than $1$ can be expressed as a product of primes."
         ];
 
         let cards = [];
@@ -470,7 +472,7 @@
                         slot.classList.remove('incorrect');
                     } else {
                         // Only mark incorrect if we have more than half correct
-                        if (correct > 5 || correct === 5) {
+                        if (correct > 4 || correct === 4) {
                             slot.classList.add('incorrect');
                         } else {
                             slot.classList.remove('incorrect');
@@ -480,8 +482,8 @@
                 }
             });
             
-            // If less than 5 correct, need to re-evaluate to only show green borders
-            if (correct < 5) {
+            // If less than 4 correct, need to re-evaluate to only show green borders
+            if (correct < 4) {
                 slots.forEach((slot, index) => {
                     const card = slot.querySelector('.card');
                     if (card) {
@@ -503,10 +505,10 @@
             if (correct === statements.length) {
                 feedback.className = 'feedback show success';
                 feedback.textContent = 'Correct';
-            } else if (correct > 5) {
+            } else if (correct > 4) {
                 feedback.className = 'feedback show partial';
                 feedback.textContent = 'Great start! More than half of the steps are sequenced correctly.';
-            } else if (correct === 5) {
+            } else if (correct === 4) {
                 feedback.className = 'feedback show partial';
                 feedback.textContent = 'Great start! Exactly half of the steps are sequenced correctly.';
             } else {
